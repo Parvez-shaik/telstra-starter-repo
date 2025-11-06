@@ -25,7 +25,6 @@ public class SimCardActivatorStepDefinitions {
     @Autowired
     private TestRestTemplate restTemplate;
     private String iccid;
-    private Long id;
     ResponseEntity<Map> responseEntity;
 
     @Given("the SIM card with ICCID {string}")
@@ -47,17 +46,14 @@ public class SimCardActivatorStepDefinitions {
 
     @Then("Activation is success")
     public void resultTrue(){
-//        assertEquals("success", response.get("status"));
         assertEquals(HttpStatus.OK,responseEntity.getStatusCode());
         assertTrue((boolean) responseEntity.getBody().get("active"));
-        id = 1L;
     }
 
     @Then("Activation is unsuccess")
     public  void resultFalse(){
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertFalse((boolean) responseEntity.getBody().get("active"));
-        id = 2L;
     }
 
     @Then("Get activation is {string}")

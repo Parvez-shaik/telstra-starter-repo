@@ -1,5 +1,7 @@
 package au.com.telstra.simcardactivator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -7,21 +9,22 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class ActivationController {
 
-    @Autowired
+    Logger logger = LoggerFactory.getLogger(getClass().getName());
+
     private ActivationService activationService;
-    
-    @Autowired
     private ActivationRepository activationRepository;
 
-//    ActivationController(ActivationService activationService){
-//        this.activationService = activationService;
-//    }
+    @Autowired
+    ActivationController(ActivationService activationService, ActivationRepository activationRepository){
+        this.activationService = activationService;
+        this.activationRepository = activationRepository;
+    }
     @PostMapping("/activate")
-    public ActivationEntity Activate(@RequestBody ActivationRequest request){
+    public ActivationEntity activate(@RequestBody ActivationRequest request){
         ActivationEntity activationEntity = activationService.activateService(request.getIccid(),request.getCustomerEmail());
-        System.out.println("------------------------------------------------------");
-        System.out.println("Activation");
-        System.out.println("------------------------------------------------------``");
+        logger.info("------------------------------------------------------");
+        logger.info("Activation");
+        logger.info("------------------------------------------------------``");
         return activationEntity;
     }
 

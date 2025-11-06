@@ -1,5 +1,7 @@
 package au.com.telstra.simcardactivator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,8 +16,14 @@ import java.util.Map;
 @Service
 public class ActivationService {
 
-    @Autowired
+    Logger logger = LoggerFactory.getLogger(getClass().getName());
+
     private ActivationRepository activationRepository;
+
+    @Autowired
+    ActivationService(ActivationRepository activationRepository){
+        this.activationRepository = activationRepository;
+    }
 
     public ActivationEntity activateService(String iccid, String email) {
         RestTemplate restTemplate = new RestTemplate();
@@ -29,15 +37,19 @@ public class ActivationService {
         ActivationEntity activationEntity = new ActivationEntity();
         activationEntity.setIccid(iccid);
         activationEntity.setCustomerEmail(email);
-        if (responseEntity.getBody() != null && responseEntity.getBody().containsKey("success")) {
-            activationEntity.setActive((Boolean) responseEntity.getBody().get("success"));
-        } else if (responseEntity.getBody() != null && responseEntity.getBody().containsKey("active")) {
-            activationEntity.setActive((Boolean) responseEntity.getBody().get("active"));
-        } else {
-            // Default to false if response doesn't indicate success
-            activationEntity.setActive(false);
+
+        Map body = responseEntity.getBody();
+
+        if(body != null){
+            if(body.containsKey("success")){
+                activationEntity.setActive(Boolean.parseBoolean((String) body.get("success")));
+            } else {
+                activationEntity.setActive(false);
+            }
         }
-        System.out.println(responseEntity.getBody());
+        if(body != null) {
+            logger.info(body.toString());
+        }
         return activationRepository.save(activationEntity);
     }
 }
