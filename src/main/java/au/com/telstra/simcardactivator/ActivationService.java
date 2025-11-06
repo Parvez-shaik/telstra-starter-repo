@@ -29,8 +29,15 @@ public class ActivationService {
         ActivationEntity activationEntity = new ActivationEntity();
         activationEntity.setIccid(iccid);
         activationEntity.setCustomerEmail(email);
-        activationEntity.setActive(true);
-        System.out.println(responseEntity);
+        if (responseEntity.getBody() != null && responseEntity.getBody().containsKey("success")) {
+            activationEntity.setActive((Boolean) responseEntity.getBody().get("success"));
+        } else if (responseEntity.getBody() != null && responseEntity.getBody().containsKey("active")) {
+            activationEntity.setActive((Boolean) responseEntity.getBody().get("active"));
+        } else {
+            // Default to false if response doesn't indicate success
+            activationEntity.setActive(false);
+        }
+        System.out.println(responseEntity.getBody());
         return activationRepository.save(activationEntity);
     }
 }
